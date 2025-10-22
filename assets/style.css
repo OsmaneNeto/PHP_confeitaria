@@ -1,0 +1,109 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #fff8f6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+footer{
+
+ margin-top: auto;
+}
+
+header {
+    background-color: #ff9aa2;
+    color: white;
+    padding: 15px;
+}
+
+.navbar-nav {
+    position: sticky;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: right;
+    gap: 15px;
+}
+
+.logo {
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    font-size: 1.3em;
+}
+
+.menu {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.menu li a {
+    text-decoration: none;
+    color: white;
+    font-weight: 500;
+}
+
+.container {
+    max-width: 800px;
+    margin: 40px auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.descricao{
+    justify-self: center;
+}
+
+.titulo {
+    text-align: center;
+    color: #ff4f5a;
+    margin-bottom: 20px;
+}
+
+.botoes-menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.btn, .btn-enviar {
+    background-color: #ffb6b9;
+    color: #333;
+    padding: 12px 25px;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn:hover, .btn-enviar:hover {
+    background-color: #ff4f5a;
+    color: white;
+}
+
+.formulario {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+footer {
+    background-color: #ff9aa2;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: 40px;
+}
