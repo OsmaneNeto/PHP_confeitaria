@@ -1,0 +1,174 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36 OPR/123.0.0.0" version="29.0.2">
+  <diagram name="Página-1" id="mVgtIjQrrKc5b-WXoEIT">
+    <mxGraphModel dx="2175" dy="1439" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="Usuário" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};participant=umlActor;verticalAlign=bottom;labelPosition=center;verticalLabelPosition=top;align=center;size=65;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry width="35" height="1070" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="TelaRegistrarCompra" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;labelBackgroundColor=none;rounded=0;perimeterSpacing=0;fillColor=default;gradientColor=none;strokeWidth=1;strokeColor=default;shadow=0;" parent="1" vertex="1">
+          <mxGeometry x="434" width="166" height="1070" as="geometry" />
+        </mxCell>
+        <mxCell id="omJAVo_2PtZrqWEtT4hH-33" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="3" vertex="1">
+          <mxGeometry x="78" y="107" width="10" height="848" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="ControladorInsumo" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="851" width="158" height="1070" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="RepositórioInsumo" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="1100" width="150" height="1070" as="geometry" />
+        </mxCell>
+        <mxCell id="omJAVo_2PtZrqWEtT4hH-37" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="5" vertex="1">
+          <mxGeometry x="70" y="473" width="10" height="171" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="alt" style="shape=umlFrame;pointerEvents=0;dropTarget=0;height=20;width=30;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="64" y="237" width="1122" height="418" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="[Dados Inválidos]" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;labelBackgroundColor=none;" parent="6" vertex="1">
+          <mxGeometry x="30" width="1092" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="[Dados Válidos]" style="shape=line;dashed=1;whiteSpace=wrap;verticalAlign=top;labelPosition=center;verticalLabelPosition=middle;align=center;labelBackgroundColor=none;" parent="6" vertex="1">
+          <mxGeometry y="160" width="1122" height="3" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="alt" style="shape=umlFrame;pointerEvents=0;dropTarget=0;height=20;width=30;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="64" y="665" width="877" height="310" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="[Falha de comunicação com Banco de Dados]" style="text;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;labelBackgroundColor=none;" parent="9" vertex="1">
+          <mxGeometry x="30" width="847" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="[Sucesso]" style="shape=line;dashed=1;whiteSpace=wrap;verticalAlign=top;labelPosition=center;verticalLabelPosition=middle;align=center;labelBackgroundColor=none;" parent="9" vertex="1">
+          <mxGeometry y="160" width="877" height="3" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="iniciarRegistroCompra()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;" parent="1" source="2" target="omJAVo_2PtZrqWEtT4hH-33" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="496" y="107" />
+            </Array>
+            <mxPoint x="22" y="107" as="sourcePoint" />
+            <mxPoint x="511.69" y="106.99600000000014" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="13" value="inserirDadosCompra(ID, custoTotal, qtdeEmbalagem)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;" parent="1" target="omJAVo_2PtZrqWEtT4hH-33" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="305" y="190" />
+            </Array>
+            <mxPoint x="17" y="190" as="sourcePoint" />
+            <mxPoint x="509" y="190" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="14" value="registrarCompra(ID, custoTotal, qtdeEmbalagem)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;" parent="1" source="omJAVo_2PtZrqWEtT4hH-33" target="omJAVo_2PtZrqWEtT4hH-36" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="732" y="217" />
+            </Array>
+            <mxPoint x="534" y="217" as="sourcePoint" />
+            <mxPoint x="908" y="217" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="15" value="mensagem" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;dashed=1;" parent="1" source="4" target="omJAVo_2PtZrqWEtT4hH-33" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="735" y="318" />
+            </Array>
+            <mxPoint x="526" y="318" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="16" value="exibirErro(mensagem)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;dashed=1;" parent="1" target="2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="308" y="372" />
+            </Array>
+            <mxPoint x="509" y="372" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="17" value="calcularCustoUnitario(...)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;" parent="1" source="4" target="omJAVo_2PtZrqWEtT4hH-37" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1061" y="473" />
+            </Array>
+            <mxPoint x="1165" y="471" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="19" value="atualizarSaldoEstoque(...)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;" parent="1" source="4" target="omJAVo_2PtZrqWEtT4hH-37" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1061" y="581" />
+            </Array>
+            <mxPoint x="1163" y="581" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="20" value="atualizarDados(...)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;" parent="1" source="omJAVo_2PtZrqWEtT4hH-37" target="tth6nzlk39RXhmtcvYAM-26" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1307.55" y="643" />
+            </Array>
+            <mxPoint x="1175.9973684210524" y="643" as="sourcePoint" />
+            <mxPoint x="1421.05" y="643" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="21" value="mensagem" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;dashed=1;" parent="1" source="4" target="omJAVo_2PtZrqWEtT4hH-33" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="735" y="746" />
+            </Array>
+            <mxPoint x="525" y="746" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="22" value="exibirErro(mensagem)" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;dashed=1;" parent="1" source="omJAVo_2PtZrqWEtT4hH-33" target="2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="308" y="800" />
+            </Array>
+            <mxPoint x="510" y="800" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="23" value="sucesso()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;dashed=1;" parent="1" source="4" target="omJAVo_2PtZrqWEtT4hH-33" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="735" y="901" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="24" value="exibirSucesso()" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;dashed=1;" parent="1" source="3" target="2" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="308" y="955" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tth6nzlk39RXhmtcvYAM-24" value="Solicita dados da compra" style="verticalAlign=bottom;edgeStyle=elbowEdgeStyle;elbow=vertical;curved=0;rounded=0;endArrow=block;labelBackgroundColor=none;fontColor=default;dashed=1;" parent="1" source="omJAVo_2PtZrqWEtT4hH-33" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="278" y="150" />
+            </Array>
+            <mxPoint x="516.5" y="150" as="sourcePoint" />
+            <mxPoint x="20" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tth6nzlk39RXhmtcvYAM-26" value="Banco de dados" style="shape=umlLifeline;perimeter=lifelinePerimeter;whiteSpace=wrap;container=1;dropTarget=0;collapsible=0;recursiveResize=0;outlineConnect=0;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};size=65;labelBackgroundColor=none;" parent="1" vertex="1">
+          <mxGeometry x="1359" width="150" height="1070" as="geometry" />
+        </mxCell>
+        <mxCell id="omJAVo_2PtZrqWEtT4hH-36" value="" style="html=1;points=[[0,0,0,0,5],[0,1,0,0,-5],[1,0,0,0,5],[1,1,0,0,-5]];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="1" vertex="1">
+          <mxGeometry x="925" y="217" width="10" height="685" as="geometry" />
+        </mxCell>
+        <mxCell id="omJAVo_2PtZrqWEtT4hH-38" value="Usuário" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" parent="1" vertex="1">
+          <mxGeometry x="2.5" y="1070" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="omJAVo_2PtZrqWEtT4hH-41" value="TelaRegistrarCompra" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="434" y="1070" width="166" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="omJAVo_2PtZrqWEtT4hH-42" value="ControladorInsumo" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="843" y="1070" width="166" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="omJAVo_2PtZrqWEtT4hH-43" value="RepositórioInsumo" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1092" y="1070" width="166" height="65" as="geometry" />
+        </mxCell>
+        <mxCell id="omJAVo_2PtZrqWEtT4hH-44" value="Banco de Dados" style="html=1;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="1351" y="1070" width="166" height="65" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
