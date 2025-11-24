@@ -9,6 +9,8 @@
         <a href="nova_encomenda.php" class="btn">🧾 Nova Encomenda</a>
         <a href="listar_encomendas.php" class="btn">📦 Encomendas</a>
         <a href="registrar_compras.php" class="btn">🛒 Registrar Compras</a>
+        <a href="gerenciar_insumos.php" class="btn">📦 Gerenciar Insumos</a>
+        <a href="gerenciar_receitas.php" class="btn">👨‍🍳 Gerenciar Receitas</a>
         <a href="#" class="btn">📊 Relatórios</a>
     </div>
 </main>
