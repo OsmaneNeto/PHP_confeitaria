@@ -15,14 +15,11 @@
         <label for="preco_total">Preço Total (R$):</label>
         <input type="number" id="preco_total" name="preco_total" step="0.01" required>
 
-        <label for="fornecedor">Fornecedor:</label>
-        <input type="text" id="fornecedor" name="fornecedor">
-
         <label for="data_compra">Data da Compra:</label>
-        <input type="date" id="data_compra" name="data_compra" value="<?php echo date('Y-m-d'); ?>">
+        <input type="date" id="data_compra" name="data_compra" value="<?php echo date('Y-m-d'); ?>" required>
 
-        <label for="observacoes">Observações:</label>
-        <textarea id="observacoes" name="observacoes" rows="3"></textarea>
+        <label for="data_validade">Data de Validade (opcional):</label>
+        <input type="date" id="data_validade" name="data_validade">
 
         <button type="submit" class="btn-enviar">Registrar Compra</button>
     </form>
@@ -73,13 +70,17 @@ function calcularCustoUnitario() {
 document.getElementById("form-compras").addEventListener("submit", async function(e) {
     e.preventDefault();
     
+    // Calcular custo unitário
+    const quantidade = parseFloat(document.getElementById('quantidade').value) || 0;
+    const precoTotal = parseFloat(document.getElementById('preco_total').value) || 0;
+    const custoUnitario = quantidade > 0 ? precoTotal / quantidade : 0;
+    
     const formData = {
-        insumo_id: document.getElementById('insumo_id').value,
-        quantidade: document.getElementById('quantidade').value,
-        preco_total: document.getElementById('preco_total').value,
-        fornecedor: document.getElementById('fornecedor').value,
+        id_insumo: document.getElementById('insumo_id').value,
+        quantidade_compra: quantidade,
+        custo_unitario: custoUnitario,
         data_compra: document.getElementById('data_compra').value,
-        observacoes: document.getElementById('observacoes').value
+        data_validade: document.getElementById('data_validade').value || null
     };
     
     try {
@@ -91,7 +92,20 @@ document.getElementById("form-compras").addEventListener("submit", async functio
             body: JSON.stringify(formData)
         });
         
-        const data = await response.json();
+        // Verificar se a resposta é válida
+        const text = await response.text();
+        if(!text || text.trim() === '') {
+            throw new Error('Resposta vazia do servidor');
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch(parseError) {
+            console.error('Erro ao fazer parse do JSON:', parseError);
+            console.error('Resposta recebida:', text);
+            throw new Error('Resposta inválida do servidor. Verifique o console.');
+        }
         
         if(data.success) {
             document.getElementById("mensagem").innerHTML = `
@@ -119,10 +133,18 @@ document.getElementById("form-compras").addEventListener("submit", async functio
         }
     } catch(error) {
         console.error('Erro:', error);
+        let errorMessage = 'Não foi possível conectar com o servidor.';
+        
+        // Tentar obter mais informações do erro
+        if(error.message) {
+            errorMessage += ' ' + error.message;
+        }
+        
         document.getElementById("mensagem").innerHTML = `
             <div style="background-color: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; margin-top: 20px;">
                 <h3>❌ Erro de conexão</h3>
-                <p>Não foi possível conectar com o servidor.</p>
+                <p>${errorMessage}</p>
+                <p style="font-size: 0.875rem; margin-top: 10px;">Verifique o console do navegador para mais detalhes.</p>
             </div>
         `;
     }

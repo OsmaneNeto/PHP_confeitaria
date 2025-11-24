@@ -13,7 +13,6 @@ class Compra {
 
     public $id_lote;
     public $id_insumo;
-    public $fornecedor;
     public $quantidade_compra;
     public $custo_unitario;
     public $data_validade;
@@ -27,32 +26,38 @@ class Compra {
      * Registrar novo lote (compra)
      */
     public function registrar() {
+        // Remover fornecedor e descrição - não existem na tabela
         $query = "INSERT INTO " . $this->table_name . " 
-                  (id_insumo, fornecedor, quantidade_compra, custo_unitario, data_validade, data_compra) 
-                  VALUES (:id_insumo, :fornecedor, :quantidade_compra, :custo_unitario, :data_validade, :data_compra)";
+                  (id_insumo, quantidade_compra, custo_unitario, data_validade, data_compra) 
+                  VALUES (:id_insumo, :quantidade_compra, :custo_unitario, :data_validade, :data_compra)";
 
-        $stmt = $this->conn->prepare($query);
+        try {
+            $stmt = $this->conn->prepare($query);
 
-        // Sanitizar dados
-        $this->fornecedor = htmlspecialchars(strip_tags($this->fornecedor));
+            // Bind dos parâmetros
+            $stmt->bindParam(':id_insumo', $this->id_insumo, PDO::PARAM_INT);
+            $stmt->bindParam(':quantidade_compra', $this->quantidade_compra, PDO::PARAM_INT);
+            $stmt->bindParam(':custo_unitario', $this->custo_unitario);
+            $stmt->bindParam(':data_validade', $this->data_validade);
+            $stmt->bindParam(':data_compra', $this->data_compra);
 
-        // Bind dos parâmetros
-        $stmt->bindParam(':id_insumo', $this->id_insumo);
-        $stmt->bindParam(':fornecedor', $this->fornecedor);
-        $stmt->bindParam(':quantidade_compra', $this->quantidade_compra);
-        $stmt->bindParam(':custo_unitario', $this->custo_unitario);
-        $stmt->bindParam(':data_validade', $this->data_validade);
-        $stmt->bindParam(':data_compra', $this->data_compra);
-
-        if($stmt->execute()) {
-            $this->id_lote = $this->conn->lastInsertId();
-            
-            // Atualizar estoque do insumo
-            $this->atualizarEstoqueInsumo();
-            
-            return true;
+            if($stmt->execute()) {
+                $this->id_lote = $this->conn->lastInsertId();
+                
+                // Atualizar estoque do insumo
+                $this->atualizarEstoqueInsumo();
+                
+                return true;
+            } else {
+                // Log do erro
+                $errorInfo = $stmt->errorInfo();
+                error_log("Erro ao registrar compra: " . print_r($errorInfo, true));
+                return false;
+            }
+        } catch(PDOException $e) {
+            error_log("PDOException ao registrar compra: " . $e->getMessage());
+            throw $e;
         }
-        return false;
     }
 
     /**
@@ -102,7 +107,6 @@ class Compra {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             $this->id_lote = $row['id_lote'];
             $this->id_insumo = $row['id_insumo'];
-            $this->fornecedor = $row['fornecedor'];
             $this->quantidade_compra = $row['quantidade_compra'];
             $this->custo_unitario = $row['custo_unitario'];
             $this->data_validade = $row['data_validade'];
