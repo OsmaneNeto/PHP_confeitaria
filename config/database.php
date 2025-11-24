@@ -23,7 +23,9 @@ class Database {
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         } catch(PDOException $exception) {
-            echo "Erro de conexão: " . $exception->getMessage();
+            // Não usar echo aqui - pode interferir com JSON responses
+            error_log("Erro de conexão com banco de dados: " . $exception->getMessage());
+            // Retornar null em caso de erro para que a API possa tratar
         }
 
         return $this->conn;

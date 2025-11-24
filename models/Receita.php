@@ -37,7 +37,7 @@ class Receita {
 
         // Sanitizar dados
         $this->nome_receita = htmlspecialchars(strip_tags($this->nome_receita));
-        
+
         // Garantir valores padrão se não definidos
         $this->rendimento_receita = $this->rendimento_receita ?? 1;
         $this->custo_total_mp = $this->custo_total_mp ?? 0;

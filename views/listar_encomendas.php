@@ -1,15 +1,18 @@
 <?php include('header.php'); ?>
 
 <main class="container">
-    <h2 class="titulo">📦 Encomendas</h2>
+    <h2 class="titulo">Encomendas</h2>
     
-    <div class="botoes-menu" style="margin-bottom: 30px;">
-        <a href="nova_encomenda.php" class="btn">➕ Nova Encomenda</a>
-        <button id="btn-filtrar" class="btn">🔍 Filtrar</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; gap: 1rem; flex-wrap: wrap;">
+        <p class="text-muted" style="margin: 0;">Gerencie todas as suas encomendas</p>
+        <div style="display: flex; gap: 0.75rem;">
+            <a href="nova_encomenda.php" class="btn">➕ Nova Encomenda</a>
+            <button id="btn-filtrar" class="btn" style="background: var(--gray-500);">🔍 Filtrar</button>
+        </div>
     </div>
 
     <!-- Filtros -->
-    <div id="filtros-container" style="display: none; margin-bottom: 30px; padding: 15px; background-color: #f8f9fa; border-radius: 8px;">
+    <div id="filtros-container" style="display: none; margin-bottom: 2rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--radius); border: 1px solid var(--gray-200);">
         <h3>Filtros</h3>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
             <div>
@@ -47,13 +50,57 @@
     </div>
 
     <!-- Modal para detalhes da encomenda -->
-    <div id="modal-detalhes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000;">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 30px; border-radius: 8px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto;">
+    <div id="modal-detalhes" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1000; animation: fadeIn 0.2s;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: var(--radius); max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: var(--shadow-lg);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h3>Detalhes da Encomenda</h3>
                 <button onclick="fecharModal()" class="btn" style="background-color: #dc3545;">✕ Fechar</button>
             </div>
             <div id="detalhes-conteudo"></div>
+        </div>
+    </div>
+
+    <!-- Modal para atualizar status de produção -->
+    <div id="modal-status-producao" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1001; animation: fadeIn 0.2s;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: var(--radius); max-width: 400px; width: 90%; box-shadow: var(--shadow-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3>Atualizar Status de Produção</h3>
+                <button type="button" id="btn-fechar-modal-producao" class="btn" style="background-color: #6c757d;">✕</button>
+            </div>
+            <div>
+                <label for="select-status-producao" style="display: block; margin-bottom: 0.75rem; font-weight: 500;">Selecione o novo status:</label>
+                <select id="select-status-producao" style="width: 100%; padding: 0.75rem; border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+                    <option value="0">Não Iniciado</option>
+                    <option value="1">Em Produção</option>
+                    <option value="2">Pronto</option>
+                    <option value="3">Entregue</option>
+                </select>
+                <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" id="btn-cancelar-producao-modal" class="btn" style="background-color: #6c757d;">Cancelar</button>
+                    <button type="button" id="btn-confirmar-producao" class="btn">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para atualizar status de pagamento -->
+    <div id="modal-status-pagamento" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 1001; animation: fadeIn 0.2s;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: var(--radius); max-width: 400px; width: 90%; box-shadow: var(--shadow-lg);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3>Atualizar Status de Pagamento</h3>
+                <button type="button" id="btn-fechar-modal-pagamento" class="btn" style="background-color: #6c757d;">✕</button>
+            </div>
+            <div>
+                <label for="select-status-pagamento" style="display: block; margin-bottom: 0.75rem; font-weight: 500;">Selecione o novo status:</label>
+                <select id="select-status-pagamento" style="width: 100%; padding: 0.75rem; border: 1.5px solid var(--gray-300); border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+                    <option value="0">Não Pago</option>
+                    <option value="1">Pago</option>
+                </select>
+                <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                    <button type="button" id="btn-cancelar-pagamento-modal" class="btn" style="background-color: #6c757d;">Cancelar</button>
+                    <button type="button" id="btn-confirmar-pagamento" class="btn">Confirmar</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -134,24 +181,21 @@ function exibirEncomendas() {
     container.innerHTML = '';
 
     if(encomendas.length === 0) {
-        container.innerHTML = '<p style="color: #666; text-align: center; padding: 20px;">Nenhuma encomenda encontrada.</p>';
+        container.innerHTML = '<p class="text-center text-muted" style="padding: 3rem;">Nenhuma encomenda encontrada.</p>';
         return;
     }
 
     encomendas.forEach(encomenda => {
         const div = document.createElement('div');
         div.className = 'encomenda-card';
-        div.style.cssText = `
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            background-color: #fff;
-        `;
+        div.className = 'encomenda-card';
+        div.style.cssText = '';
         
-        const statusProducao = ['Não Iniciada', 'Em Produção', 'Concluída'][encomenda.status_producao] || 'Desconhecido';
+        const statusProducaoLabels = ['Não Iniciado', 'Em Produção', 'Pronto', 'Entregue'];
+        const statusProducao = statusProducaoLabels[encomenda.status_producao] || 'Desconhecido';
         const statusPagamento = encomenda.status_pagamento == 1 ? 'Pago' : 'Não Pago';
-        const corProducao = encomenda.status_producao == 0 ? '#ffc107' : encomenda.status_producao == 1 ? '#17a2b8' : '#28a745';
+        const coresProducao = ['#ffc107', '#17a2b8', '#28a745', '#6c757d'];
+        const corProducao = coresProducao[encomenda.status_producao] || '#6c757d';
         const corPagamento = encomenda.status_pagamento == 1 ? '#28a745' : '#dc3545';
         
         div.innerHTML = `
@@ -191,6 +235,18 @@ function formatarData(data) {
     return date.toLocaleDateString('pt-BR');
 }
 
+// Formatar telefone
+function formatarTelefone(telefone) {
+    if(!telefone) return 'Não informado';
+    const tel = telefone.toString();
+    if(tel.length === 11) {
+        return `(${tel.substring(0,2)}) ${tel.substring(2,7)}-${tel.substring(7)}`;
+    } else if(tel.length === 10) {
+        return `(${tel.substring(0,2)}) ${tel.substring(2,6)}-${tel.substring(6)}`;
+    }
+    return tel;
+}
+
 // Ver detalhes da encomenda
 async function verDetalhes(id) {
     try {
@@ -201,8 +257,14 @@ async function verDetalhes(id) {
             const encomenda = data.data;
             const container = document.getElementById('detalhes-conteudo');
             
-            const statusProducao = ['Não Iniciada', 'Em Produção', 'Concluída'][encomenda.status_producao] || 'Desconhecido';
+            const statusProducaoLabels = ['Não Iniciado', 'Em Produção', 'Pronto', 'Entregue'];
+            const statusProducao = statusProducaoLabels[encomenda.status_producao] || 'Desconhecido';
             const statusPagamento = encomenda.status_pagamento == 1 ? 'Pago' : 'Não Pago';
+            
+            // Cores para os status de produção
+            const coresProducao = ['#ffc107', '#17a2b8', '#28a745', '#6c757d'];
+            const corProducao = coresProducao[encomenda.status_producao] || '#6c757d';
+            const corPagamento = encomenda.status_pagamento == 1 ? '#28a745' : '#dc3545';
             
             let itensHtml = '';
             if(encomenda.itens && encomenda.itens.length > 0) {
@@ -213,17 +275,24 @@ async function verDetalhes(id) {
                 itensHtml += '</ul>';
             }
             
+            // Formatar telefone
+            const telefoneFormatado = encomenda.telefone_cliente ? formatarTelefone(encomenda.telefone_cliente) : 'N/A';
+            
             container.innerHTML = `
                 <div>
-                    <p><strong>ID:</strong> ${encomenda.id_encomenda}</p>
-                    <p><strong>Cliente:</strong> ${encomenda.nome_cliente || 'N/A'}</p>
-                    <p><strong>Telefone:</strong> ${encomenda.telefone_cliente || 'N/A'}</p>
-                    <p><strong>Endereço:</strong> ${encomenda.endereço_cliente || 'N/A'}</p>
+                    <h4 style="margin-bottom: 1rem; color: var(--primary);">Informações da Encomenda</h4>
+                    <p><strong>ID:</strong> #${encomenda.id_encomenda}</p>
                     <p><strong>Data do Pedido:</strong> ${formatarData(encomenda.data_pedido)}</p>
                     <p><strong>Data de Entrega:</strong> ${formatarData(encomenda.data_entrega_retirada)}</p>
-                    <p><strong>Status de Produção:</strong> ${statusProducao}</p>
-                    <p><strong>Status de Pagamento:</strong> ${statusPagamento}</p>
+                    <p><strong>Status de Produção:</strong> <span style="background-color: ${corProducao}; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">${statusProducao}</span></p>
+                    <p><strong>Status de Pagamento:</strong> <span style="background-color: ${corPagamento}; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.875rem;">${statusPagamento}</span></p>
                     <p><strong>Valor Total:</strong> R$ ${parseFloat(encomenda.valor_total).toFixed(2)}</p>
+                    
+                    <h4 style="margin-top: 1.5rem; margin-bottom: 1rem; color: var(--primary);">Informações do Cliente</h4>
+                    <p><strong>Nome:</strong> ${encomenda.nome_cliente || 'N/A'}</p>
+                    <p><strong>Telefone:</strong> ${telefoneFormatado}</p>
+                    <p><strong>Endereço:</strong> ${encomenda.endereço_cliente || 'N/A'}</p>
+                    
                     ${itensHtml}
                 </div>
             `;
@@ -243,67 +312,141 @@ function fecharModal() {
     document.getElementById('modal-detalhes').style.display = 'none';
 }
 
-// Atualizar status de produção
-async function atualizarStatusProducao(id) {
-    const statusAtual = encomendas.find(e => e.id_encomenda == id)?.status_producao || 0;
-    const novoStatus = (statusAtual + 1) % 3; // Alterna entre 0, 1, 2
+// Variáveis globais para os modais
+var encomendaIdProducao = null;
+var encomendaIdPagamento = null;
+
+// Abrir modal de status de produção
+window.atualizarStatusProducao = function(id) {
+    encomendaIdProducao = id;
+    const encomenda = encomendas.find(e => e.id_encomenda == id);
+    const select = document.getElementById('select-status-producao');
+    if(encomenda) {
+        select.value = encomenda.status_producao || 0;
+    }
+    document.getElementById('modal-status-producao').style.display = 'block';
+}
+
+// Fechar modal de produção
+window.fecharModalProducao = function() {
+    document.getElementById('modal-status-producao').style.display = 'none';
+    encomendaIdProducao = null;
+}
+
+// Confirmar atualização de status de produção
+window.confirmarStatusProducao = async function() {
+    if(!encomendaIdProducao) {
+        console.error('ID da encomenda não definido');
+        return;
+    }
+    
+    const select = document.getElementById('select-status-producao');
+    if(!select) {
+        console.error('Select de status não encontrado');
+        return;
+    }
+    
+    const novoStatus = parseInt(select.value);
+    console.log('Atualizando status de produção:', encomendaIdProducao, 'para', novoStatus);
     
     try {
-        const response = await fetch('../api/encomendas.php', {
-            method: 'PUT',
+        // Usar GET com parâmetros na URL - mais simples e confiável
+        const url = `../api/encomendas.php?acao=atualizar_status_producao&id_encomenda=${encomendaIdProducao}&status_producao=${novoStatus}`;
+        const response = await fetch(url, {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                atualizar_status_producao: true,
-                id_encomenda: id,
-                status_producao: novoStatus
-            })
+            }
         });
         
-        const data = await response.json();
+        const text = await response.text();
+        console.log('Resposta bruta:', text);
+        
+        if(!text || text.trim() === '') {
+            mostrarMensagem('Erro: Resposta vazia do servidor', 'error');
+            return;
+        }
+        
+        const data = JSON.parse(text);
+        console.log('Resposta da API:', data);
         
         if(data.success) {
             mostrarMensagem('Status de produção atualizado!', 'success');
+            fecharModalProducao();
             carregarEncomendas();
         } else {
-            mostrarMensagem('Erro ao atualizar status: ' + data.message, 'error');
+            mostrarMensagem('Erro ao atualizar status: ' + (data.message || 'Erro desconhecido'), 'error');
         }
     } catch(error) {
         console.error('Erro:', error);
-        mostrarMensagem('Erro ao atualizar status', 'error');
+        mostrarMensagem('Erro ao atualizar status: ' + error.message, 'error');
     }
 }
 
-// Atualizar status de pagamento
-async function atualizarStatusPagamento(id) {
-    const statusAtual = encomendas.find(e => e.id_encomenda == id)?.status_pagamento || 0;
-    const novoStatus = statusAtual == 0 ? 1 : 0; // Alterna entre 0 e 1
+// Abrir modal de status de pagamento
+window.atualizarStatusPagamento = function(id) {
+    encomendaIdPagamento = id;
+    const encomenda = encomendas.find(e => e.id_encomenda == id);
+    const select = document.getElementById('select-status-pagamento');
+    if(encomenda) {
+        select.value = encomenda.status_pagamento || 0;
+    }
+    document.getElementById('modal-status-pagamento').style.display = 'block';
+}
+
+// Fechar modal de pagamento
+window.fecharModalPagamento = function() {
+    document.getElementById('modal-status-pagamento').style.display = 'none';
+    encomendaIdPagamento = null;
+}
+
+// Confirmar atualização de status de pagamento
+window.confirmarStatusPagamento = async function() {
+    if(!encomendaIdPagamento) {
+        console.error('ID da encomenda não definido');
+        return;
+    }
+    
+    const select = document.getElementById('select-status-pagamento');
+    if(!select) {
+        console.error('Select de status não encontrado');
+        return;
+    }
+    
+    const novoStatus = parseInt(select.value);
+    console.log('Atualizando status de pagamento:', encomendaIdPagamento, 'para', novoStatus);
     
     try {
-        const response = await fetch('../api/encomendas.php', {
-            method: 'PUT',
+        // Usar GET com parâmetros na URL - mais simples e confiável
+        const url = `../api/encomendas.php?acao=atualizar_status_pagamento&id_encomenda=${encomendaIdPagamento}&status_pagamento=${novoStatus}`;
+        const response = await fetch(url, {
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                atualizar_status_pagamento: true,
-                id_encomenda: id,
-                status_pagamento: novoStatus
-            })
+            }
         });
         
-        const data = await response.json();
+        const text = await response.text();
+        console.log('Resposta bruta:', text);
+        
+        if(!text || text.trim() === '') {
+            mostrarMensagem('Erro: Resposta vazia do servidor', 'error');
+            return;
+        }
+        
+        const data = JSON.parse(text);
+        console.log('Resposta da API:', data);
         
         if(data.success) {
             mostrarMensagem('Status de pagamento atualizado!', 'success');
+            fecharModalPagamento();
             carregarEncomendas();
         } else {
-            mostrarMensagem('Erro ao atualizar status: ' + data.message, 'error');
+            mostrarMensagem('Erro ao atualizar status: ' + (data.message || 'Erro desconhecido'), 'error');
         }
     } catch(error) {
         console.error('Erro:', error);
-        mostrarMensagem('Erro ao atualizar status', 'error');
+        mostrarMensagem('Erro ao atualizar status: ' + error.message, 'error');
     }
 }
 
@@ -339,18 +482,18 @@ async function excluirEncomenda(id) {
 // Mostrar mensagem
 function mostrarMensagem(texto, tipo) {
     const container = document.getElementById('mensagem');
-    const cor = tipo === 'success' ? '#d4edda' : '#f8d7da';
-    const textoCor = tipo === 'success' ? '#155724' : '#721c24';
+    const cor = tipo === 'success' ? 'var(--success)' : 'var(--danger)';
+    const bgCor = tipo === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
     
     container.innerHTML = `
-        <div style="background-color: ${cor}; color: ${textoCor}; padding: 15px; border-radius: 8px; margin-top: 20px;">
+        <div style="background-color: ${bgCor}; color: ${cor}; border-left: 4px solid ${cor};">
             ${texto}
         </div>
     `;
     
     setTimeout(() => {
         container.innerHTML = '';
-    }, 3000);
+    }, 4000);
 }
 
 // Event listeners
@@ -378,11 +521,48 @@ document.getElementById('btn-limpar-filtros').addEventListener('click', function
     carregarEncomendas();
 });
 
-// Fechar modal ao clicar fora
+// Fechar modais ao clicar fora
 document.getElementById('modal-detalhes').addEventListener('click', function(e) {
     if(e.target === this) {
         fecharModal();
     }
+});
+
+document.getElementById('modal-status-producao').addEventListener('click', function(e) {
+    if(e.target === this) {
+        fecharModalProducao();
+    }
+});
+
+document.getElementById('modal-status-pagamento').addEventListener('click', function(e) {
+    if(e.target === this) {
+        fecharModalPagamento();
+    }
+});
+
+// Event listeners para os botões de confirmar
+document.getElementById('btn-confirmar-producao').addEventListener('click', function() {
+    confirmarStatusProducao();
+});
+
+document.getElementById('btn-cancelar-producao-modal').addEventListener('click', function() {
+    fecharModalProducao();
+});
+
+document.getElementById('btn-fechar-modal-producao').addEventListener('click', function() {
+    fecharModalProducao();
+});
+
+document.getElementById('btn-confirmar-pagamento').addEventListener('click', function() {
+    confirmarStatusPagamento();
+});
+
+document.getElementById('btn-cancelar-pagamento-modal').addEventListener('click', function() {
+    fecharModalPagamento();
+});
+
+document.getElementById('btn-fechar-modal-pagamento').addEventListener('click', function() {
+    fecharModalPagamento();
 });
 
 // Carregar dados iniciais

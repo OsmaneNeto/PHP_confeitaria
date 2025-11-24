@@ -1,7 +1,7 @@
 <?php include('header.php'); ?>
 
 <main class="container">
-    <h2 class="titulo">🧾 Nova Encomenda</h2>
+    <h2 class="titulo">Nova Encomenda</h2>
     
     <form id="form-encomenda" class="formulario">
         <label for="id_cliente">Cliente:</label>
@@ -23,9 +23,9 @@
             <button type="button" id="btn-adicionar-item" class="btn" style="margin-top: 10px;">➕ Adicionar Item</button>
         </div>
 
-        <div style="margin-top: 20px; padding: 15px; background-color: #f0f8ff; border-radius: 8px;">
-            <h3>💰 Resumo</h3>
-            <p><strong>Valor Total:</strong> R$ <span id="valor-total">0,00</span></p>
+        <div style="margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); border-radius: var(--radius); color: white;">
+            <h3 style="color: white; margin-bottom: 0.75rem;">💰 Resumo</h3>
+            <p style="font-size: 1.5rem; font-weight: 600; margin: 0;"><strong>Valor Total:</strong> R$ <span id="valor-total">0,00</span></p>
         </div>
 
         <div style="margin-top: 20px;">
@@ -271,11 +271,11 @@ document.getElementById('form-encomenda').addEventListener('submit', async funct
 // Mostrar mensagem
 function mostrarMensagem(texto, tipo) {
     const container = document.getElementById('mensagem');
-    const cor = tipo === 'success' ? '#d4edda' : '#f8d7da';
-    const textoCor = tipo === 'success' ? '#155724' : '#721c24';
+    const cor = tipo === 'success' ? 'var(--success)' : 'var(--danger)';
+    const bgCor = tipo === 'success' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
     
     container.innerHTML = `
-        <div style="background-color: ${cor}; color: ${textoCor}; padding: 15px; border-radius: 8px; margin-top: 20px;">
+        <div style="background-color: ${bgCor}; color: ${cor}; border-left: 4px solid ${cor};">
             ${texto}
         </div>
     `;
@@ -283,7 +283,7 @@ function mostrarMensagem(texto, tipo) {
     if(tipo === 'success') {
         setTimeout(() => {
             container.innerHTML = '';
-        }, 3000);
+        }, 4000);
     }
 }
 

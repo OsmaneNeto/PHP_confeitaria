@@ -16,9 +16,6 @@
             <label for="nome">Nome do Insumo:</label>
             <input type="text" id="nome" name="nome" required>
 
-            <label for="descricao">Descrição:</label>
-            <textarea id="descricao" name="descricao" rows="3"></textarea>
-
             <label for="unidade_medida">Unidade de Medida:</label>
             <select id="unidade_medida" name="unidade_medida" required>
                 <option value="">Selecione...</option>
@@ -39,12 +36,6 @@
 
             <label for="custo_unitario_atual">Custo Unitário Atual (R$):</label>
             <input type="number" id="custo_unitario_atual" name="custo_unitario_atual" step="0.01" value="0">
-
-            <label for="categoria">Categoria:</label>
-            <input type="text" id="categoria" name="categoria" placeholder="Ex: Ingredientes Básicos">
-
-            <label for="fornecedor">Fornecedor:</label>
-            <input type="text" id="fornecedor" name="fornecedor">
 
             <button type="submit" class="btn-enviar">Salvar Insumo</button>
             <button type="button" id="btn-cancelar" class="btn" style="background-color: #6c757d;">Cancelar</button>
@@ -111,11 +102,9 @@ function exibirInsumos() {
             <div style="display: flex; justify-content: space-between; align-items: start;">
                 <div>
                     <h4>${insumo.nome}</h4>
-                    <p><strong>Categoria:</strong> ${insumo.categoria || 'Não definida'}</p>
                     <p><strong>Estoque:</strong> ${insumo.estoque_atual} ${insumo.unidade_medida}</p>
                     <p><strong>Mínimo:</strong> ${insumo.estoque_minimo} ${insumo.unidade_medida}</p>
                     <p><strong>Custo Unitário:</strong> R$ ${parseFloat(insumo.custo_unitario_atual).toFixed(2)}</p>
-                    <p><strong>Fornecedor:</strong> ${insumo.fornecedor || 'Não informado'}</p>
                 </div>
                 <div>
                     <button onclick="editarInsumo(${insumo.id})" class="btn" style="margin: 2px;">✏️ Editar</button>
@@ -239,20 +228,28 @@ async function carregarEstatisticas() {
 document.getElementById('form-insumo').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    const idEditar = document.getElementById('insumo_id_editar')?.value;
+    const isEdit = idEditar && idEditar > 0;
+    
     const formData = {
         nome: document.getElementById('nome').value,
-        descricao: document.getElementById('descricao').value,
+        nome_insumo: document.getElementById('nome').value,
         unidade_medida: document.getElementById('unidade_medida').value,
         estoque_atual: document.getElementById('estoque_atual').value,
+        quantidade_estoque: document.getElementById('estoque_atual').value,
         estoque_minimo: document.getElementById('estoque_minimo').value,
         custo_unitario_atual: document.getElementById('custo_unitario_atual').value,
-        categoria: document.getElementById('categoria').value,
-        fornecedor: document.getElementById('fornecedor').value
+        custo_unitario: document.getElementById('custo_unitario_atual').value
     };
+    
+    if(isEdit) {
+        formData.id = idEditar;
+        formData.id_insumo = idEditar;
+    }
     
     try {
         const response = await fetch('../api/insumos.php', {
-            method: 'POST',
+            method: isEdit ? 'PUT' : 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -262,18 +259,84 @@ document.getElementById('form-insumo').addEventListener('submit', async function
         const data = await response.json();
         
         if(data.success) {
-            mostrarMensagem('Insumo cadastrado com sucesso!', 'success');
+            mostrarMensagem(isEdit ? 'Insumo atualizado com sucesso!' : 'Insumo cadastrado com sucesso!', 'success');
             document.getElementById('form-novo-insumo').style.display = 'none';
             document.getElementById('form-insumo').reset();
+            const idInput = document.getElementById('insumo_id_editar');
+            if(idInput) idInput.remove();
             carregarInsumos();
         } else {
-            mostrarMensagem(data.message, 'error');
+            mostrarMensagem(data.message || 'Erro ao salvar insumo', 'error');
         }
     } catch(error) {
         console.error('Erro:', error);
-        mostrarMensagem('Erro ao cadastrar insumo', 'error');
+        mostrarMensagem('Erro ao salvar insumo', 'error');
     }
 });
+
+// Editar insumo
+async function editarInsumo(id) {
+    try {
+        const response = await fetch(`../api/insumos.php?id=${id}`);
+        const data = await response.json();
+        
+        if(data.success) {
+            const insumo = data.data;
+            document.getElementById('nome').value = insumo.nome_insumo || insumo.nome || '';
+            document.getElementById('unidade_medida').value = insumo.unidade_medida || '';
+            document.getElementById('estoque_atual').value = insumo.quantidade_estoque || insumo.estoque_atual || 0;
+            document.getElementById('estoque_minimo').value = insumo.estoque_minimo || 0;
+            document.getElementById('custo_unitario_atual').value = insumo.custo_unitario || insumo.custo_unitario_atual || 0;
+            
+            // Criar um campo hidden para o ID
+            let idInput = document.getElementById('insumo_id_editar');
+            if(!idInput) {
+                idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.id = 'insumo_id_editar';
+                document.getElementById('form-insumo').appendChild(idInput);
+            }
+            idInput.value = insumo.id_insumo || insumo.id;
+            
+            document.getElementById('form-novo-insumo').style.display = 'block';
+            document.getElementById('form-novo-insumo').scrollIntoView({ behavior: 'smooth' });
+        } else {
+            mostrarMensagem('Erro ao carregar dados do insumo', 'error');
+        }
+    } catch(error) {
+        console.error('Erro:', error);
+        mostrarMensagem('Erro ao carregar dados do insumo', 'error');
+    }
+}
+
+// Excluir insumo
+async function excluirInsumo(id) {
+    if(!confirm('Tem certeza que deseja excluir este insumo?')) {
+        return;
+    }
+    
+    try {
+        const response = await fetch('../api/insumos.php', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id_insumo: id, id: id })
+        });
+        
+        const data = await response.json();
+        
+        if(data.success) {
+            mostrarMensagem('Insumo excluído com sucesso!', 'success');
+            carregarInsumos();
+        } else {
+            mostrarMensagem(data.message || 'Erro ao excluir insumo', 'error');
+        }
+    } catch(error) {
+        console.error('Erro:', error);
+        mostrarMensagem('Erro ao excluir insumo', 'error');
+    }
+}
 
 // Marcar alerta como visualizado
 async function marcarAlertaVisualizado(alertaId) {

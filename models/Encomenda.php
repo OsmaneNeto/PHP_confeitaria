@@ -156,10 +156,15 @@ class Encomenda {
                   WHERE id_encomenda = :id_encomenda";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':status_producao', $status);
-        $stmt->bindParam(':id_encomenda', $this->id_encomenda);
+        $stmt->bindParam(':status_producao', $status, PDO::PARAM_STR);
+        $stmt->bindParam(':id_encomenda', $this->id_encomenda, PDO::PARAM_INT);
 
-        return $stmt->execute();
+        try {
+            return $stmt->execute();
+        } catch(PDOException $e) {
+            error_log("Erro ao atualizar status de produção: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -171,10 +176,15 @@ class Encomenda {
                   WHERE id_encomenda = :id_encomenda";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':status_pagamento', $status);
-        $stmt->bindParam(':id_encomenda', $this->id_encomenda);
+        $stmt->bindParam(':status_pagamento', $status, PDO::PARAM_STR);
+        $stmt->bindParam(':id_encomenda', $this->id_encomenda, PDO::PARAM_INT);
 
-        return $stmt->execute();
+        try {
+            return $stmt->execute();
+        } catch(PDOException $e) {
+            error_log("Erro ao atualizar status de pagamento: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**

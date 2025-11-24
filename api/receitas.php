@@ -109,7 +109,21 @@ switch($method) {
             $stmt = $receita->listar();
             $receitas = array();
             while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $receitas[] = $row;
+                // Mapear campos do banco para o formato esperado pelo frontend
+                $receitas[] = array(
+                    'id' => $row['id_receita'],
+                    'id_receita' => $row['id_receita'],
+                    'nome' => $row['nome_receita'],
+                    'nome_receita' => $row['nome_receita'],
+                    'rendimento' => $row['rendimento_receita'],
+                    'rendimento_receita' => $row['rendimento_receita'],
+                    'custo_total_mp' => $row['custo_total_mp'],
+                    'custo_total' => $row['custo_total_mp'],
+                    'custo_unitario' => $row['custo_unitario'],
+                    'preco_venda_sugerido' => $row['preco_venda_sugerido'],
+                    'taxa_lucro_receita' => $row['taxa_lucro_receita'],
+                    'margem_lucro' => ($row['taxa_lucro_receita'] * 100) // Converter para porcentagem
+                );
             }
             echo json_encode(array('success' => true, 'data' => $receitas));
         }
@@ -140,15 +154,15 @@ switch($method) {
                 $receita->taxa_lucro_receita = (float)$taxa_lucro;
 
                 try {
-                    if($receita->criar()) {
-                        http_response_code(201);
-                        echo json_encode(array(
-                            'success' => true, 
-                            'message' => 'Receita criada com sucesso',
-                            'data' => array('id_receita' => $receita->id_receita)
-                        ));
-                    } else {
-                        http_response_code(500);
+                if($receita->criar()) {
+                    http_response_code(201);
+                    echo json_encode(array(
+                        'success' => true, 
+                        'message' => 'Receita criada com sucesso',
+                        'data' => array('id_receita' => $receita->id_receita)
+                    ));
+                } else {
+                    http_response_code(500);
                         echo json_encode(array('success' => false, 'message' => 'Erro ao criar receita. Verifique os dados e tente novamente.'));
                     }
                 } catch(Exception $e) {
@@ -168,11 +182,11 @@ switch($method) {
             if($receita_id > 0 && $insumo_id > 0 && $quantidade_gasta_insumo > 0) {
                 $receita->id_receita = $receita_id;
                 try {
-                    if($receita->adicionarIngrediente($insumo_id, $quantidade_gasta_insumo)) {
-                        $receita->atualizarCustoTotal();
-                        echo json_encode(array('success' => true, 'message' => 'Ingrediente adicionado com sucesso'));
-                    } else {
-                        http_response_code(500);
+                if($receita->adicionarIngrediente($insumo_id, $quantidade_gasta_insumo)) {
+                    $receita->atualizarCustoTotal();
+                    echo json_encode(array('success' => true, 'message' => 'Ingrediente adicionado com sucesso'));
+                } else {
+                    http_response_code(500);
                         echo json_encode(array('success' => false, 'message' => 'Erro ao adicionar ingrediente. Verifique os dados e tente novamente.'));
                     }
                 } catch(Exception $e) {
@@ -183,21 +197,32 @@ switch($method) {
                 http_response_code(400);
                 echo json_encode(array('success' => false, 'message' => 'Receita, insumo e quantidade são obrigatórios'));
             }
-        } elseif(isset($input['atualizar_taxa'])) {
+        } elseif(isset($input['atualizar_taxa']) || isset($input['atualizar_margem'])) {
             // Atualizar taxa de lucro e recalcular preço
             $receita_id = $input['receita_id'] ?? 0;
             $taxa_lucro = $input['taxa_lucro_receita'] ?? 0;
+            $margem_lucro = $input['margem_lucro'] ?? 0;
+            
+            // Se recebeu margem_lucro em porcentagem, converter para decimal
+            if($margem_lucro > 0 && $taxa_lucro == 0) {
+                $taxa_lucro = $margem_lucro / 100;
+            }
 
             if($receita_id > 0) {
                 $receita->id_receita = $receita_id;
                 $receita->taxa_lucro_receita = $taxa_lucro;
                 
-                if($receita->atualizar()) {
-                    $receita->atualizarCustoTotal(); // Isso também recalcula o preço de venda
-                    echo json_encode(array('success' => true, 'message' => 'Taxa de lucro atualizada com sucesso'));
-                } else {
+                try {
+                    if($receita->atualizar()) {
+                        $receita->atualizarCustoTotal(); // Isso também recalcula o preço de venda
+                        echo json_encode(array('success' => true, 'message' => 'Taxa de lucro atualizada com sucesso'));
+                    } else {
+                        http_response_code(500);
+                        echo json_encode(array('success' => false, 'message' => 'Erro ao atualizar taxa de lucro'));
+                    }
+                } catch(Exception $e) {
                     http_response_code(500);
-                    echo json_encode(array('success' => false, 'message' => 'Erro ao atualizar taxa de lucro'));
+                    echo json_encode(array('success' => false, 'message' => 'Erro ao atualizar taxa de lucro: ' . $e->getMessage()));
                 }
             } else {
                 http_response_code(400);
@@ -211,21 +236,36 @@ switch($method) {
 
     case 'PUT':
         // Atualizar receita
-        if(!empty($input['id_receita'])) {
-            $receita->id_receita = $input['id_receita'];
-            $receita->nome_receita = $input['nome_receita'] ?? '';
-            $receita->rendimento_receita = $input['rendimento_receita'] ?? 1;
+        $id_receita = $input['id_receita'] ?? 0;
+        if($id_receita > 0) {
+            $receita->id_receita = $id_receita;
+            $receita->nome_receita = $input['nome_receita'] ?? $input['nome'] ?? '';
+            $receita->rendimento_receita = $input['rendimento_receita'] ?? $input['rendimento'] ?? 1;
+            
+            // Valores calculados - manter os existentes se não fornecidos
             $receita->custo_total_mp = $input['custo_total_mp'] ?? 0;
             $receita->custo_unitario = $input['custo_unitario'] ?? 0;
             $receita->preco_venda_sugerido = $input['preco_venda_sugerido'] ?? 0;
-            $receita->taxa_lucro_receita = $input['taxa_lucro_receita'] ?? 0;
+            
+            // Taxa de lucro - converter de porcentagem se necessário
+            $taxa_lucro = $input['taxa_lucro_receita'] ?? 0;
+            $margem_lucro = $input['margem_lucro'] ?? 0;
+            if($margem_lucro > 0 && $taxa_lucro == 0) {
+                $taxa_lucro = $margem_lucro / 100;
+            }
+            $receita->taxa_lucro_receita = $taxa_lucro;
 
-            if($receita->atualizar()) {
-                $receita->atualizarCustoTotal();
-                echo json_encode(array('success' => true, 'message' => 'Receita atualizada com sucesso'));
-            } else {
+            try {
+                if($receita->atualizar()) {
+                    $receita->atualizarCustoTotal();
+                    echo json_encode(array('success' => true, 'message' => 'Receita atualizada com sucesso'));
+                } else {
+                    http_response_code(500);
+                    echo json_encode(array('success' => false, 'message' => 'Erro ao atualizar receita. Verifique os dados e tente novamente.'));
+                }
+            } catch(Exception $e) {
                 http_response_code(500);
-                echo json_encode(array('success' => false, 'message' => 'Erro ao atualizar receita'));
+                echo json_encode(array('success' => false, 'message' => 'Erro ao atualizar receita: ' . $e->getMessage()));
             }
         } else {
             http_response_code(400);
@@ -235,13 +275,19 @@ switch($method) {
 
     case 'DELETE':
         // Excluir receita
-        if(!empty($input['id_receita'])) {
-            $receita->id_receita = $input['id_receita'];
-            if($receita->excluir()) {
-                echo json_encode(array('success' => true, 'message' => 'Receita excluída com sucesso'));
-            } else {
+        $id_receita = $input['id_receita'] ?? $input['id'] ?? 0;
+        if($id_receita > 0) {
+            $receita->id_receita = $id_receita;
+            try {
+                if($receita->excluir()) {
+                    echo json_encode(array('success' => true, 'message' => 'Receita excluída com sucesso'));
+                } else {
+                    http_response_code(500);
+                    echo json_encode(array('success' => false, 'message' => 'Erro ao excluir receita'));
+                }
+            } catch(Exception $e) {
                 http_response_code(500);
-                echo json_encode(array('success' => false, 'message' => 'Erro ao excluir receita'));
+                echo json_encode(array('success' => false, 'message' => 'Erro ao excluir receita: ' . $e->getMessage()));
             }
         } elseif(isset($input['remover_ingrediente'])) {
             // Remover ingrediente da receita
