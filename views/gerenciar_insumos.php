@@ -121,15 +121,30 @@ function exibirInsumos() {
 async function verificarAlertas() {
     try {
         const response = await fetch('../api/alertas.php?verificar_alertas=1');
-        const data = await response.json();
+        const text = await response.text();
+        
+        if(!text || text.trim() === '') {
+            throw new Error('Resposta vazia do servidor');
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch(parseError) {
+            console.error('Erro ao fazer parse do JSON:', parseError);
+            console.error('Resposta recebida:', text);
+            throw new Error('Resposta inválida do servidor');
+        }
         
         if(data.success) {
             mostrarMensagem(`Verificação concluída! ${data.data.alertas_gerados} novos alertas gerados.`, 'success');
             carregarAlertas();
+        } else {
+            mostrarMensagem(data.message || 'Erro ao verificar alertas', 'error');
         }
     } catch(error) {
         console.error('Erro ao verificar alertas:', error);
-        mostrarMensagem('Erro ao verificar alertas', 'error');
+        mostrarMensagem('Erro ao verificar alertas: ' + error.message, 'error');
     }
 }
 
@@ -137,14 +152,38 @@ async function verificarAlertas() {
 async function carregarAlertas() {
     try {
         const response = await fetch('../api/alertas.php?nao_visualizados=1');
-        const data = await response.json();
+        const text = await response.text();
+        
+        if(!text || text.trim() === '') {
+            console.warn('Resposta vazia ao carregar alertas');
+            alertas = [];
+            exibirAlertas();
+            return;
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch(parseError) {
+            console.error('Erro ao fazer parse do JSON:', parseError);
+            console.error('Resposta recebida:', text);
+            alertas = [];
+            exibirAlertas();
+            return;
+        }
         
         if(data.success) {
-            alertas = data.data;
+            alertas = data.data || [];
+            exibirAlertas();
+        } else {
+            console.error('Erro ao carregar alertas:', data.message);
+            alertas = [];
             exibirAlertas();
         }
     } catch(error) {
         console.error('Erro ao carregar alertas:', error);
+        alertas = [];
+        exibirAlertas();
     }
 }
 
@@ -173,7 +212,7 @@ function exibirAlertas() {
             <div style="display: flex; justify-content: space-between; align-items: start;">
                 <div>
                     <h4>⚠️ ${alerta.tipo_alerta === 'estoque_zerado' ? 'ESTOQUE ZERADO' : 'ESTOQUE MÍNIMO'}</h4>
-                    <p><strong>Insumo:</strong> ${alerta.insumo_nome}</p>
+                    <p><strong>Insumo:</strong> ${alerta.nome_insumo || alerta.insumo_nome || 'N/A'}</p>
                     <p><strong>Estoque Atual:</strong> ${alerta.quantidade_atual} ${alerta.unidade_medida}</p>
                     <p><strong>Estoque Mínimo:</strong> ${alerta.quantidade_minima} ${alerta.unidade_medida}</p>
                     <p><strong>Data do Alerta:</strong> ${new Date(alerta.data_alerta).toLocaleString()}</p>
@@ -192,7 +231,21 @@ function exibirAlertas() {
 async function carregarEstatisticas() {
     try {
         const response = await fetch('../api/alertas.php?estatisticas=1');
-        const data = await response.json();
+        const text = await response.text();
+        
+        if(!text || text.trim() === '') {
+            console.warn('Resposta vazia ao carregar estatísticas');
+            return;
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch(parseError) {
+            console.error('Erro ao fazer parse do JSON:', parseError);
+            console.error('Resposta recebida:', text);
+            return;
+        }
         
         if(data.success) {
             const stats = data.data;
@@ -352,17 +405,30 @@ async function marcarAlertaVisualizado(alertaId) {
             })
         });
         
-        const data = await response.json();
+        const text = await response.text();
+        
+        if(!text || text.trim() === '') {
+            throw new Error('Resposta vazia do servidor');
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch(parseError) {
+            console.error('Erro ao fazer parse do JSON:', parseError);
+            console.error('Resposta recebida:', text);
+            throw new Error('Resposta inválida do servidor');
+        }
         
         if(data.success) {
             mostrarMensagem('Alerta marcado como visualizado', 'success');
             carregarAlertas();
         } else {
-            mostrarMensagem(data.message, 'error');
+            mostrarMensagem(data.message || 'Erro ao marcar alerta', 'error');
         }
     } catch(error) {
         console.error('Erro:', error);
-        mostrarMensagem('Erro ao marcar alerta', 'error');
+        mostrarMensagem('Erro ao marcar alerta: ' + error.message, 'error');
     }
 }
 
