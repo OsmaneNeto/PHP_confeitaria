@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Tempo de geração: 24/11/2025 às 20:40
+-- Tempo de geração: 27/11/2025 às 21:47
 -- Versão do servidor: 10.4.32-MariaDB
--- Versão do PHP: 8.0.30
+-- Versão do PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,7 +18,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Banco de dados: `confeitaria_db`
+-- Banco de dados: `doceria_bd`
 --
 
 -- --------------------------------------------------------
@@ -30,7 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `cliente` (
   `id_cliente` int(11) NOT NULL,
   `nome_cliente` varchar(50) NOT NULL,
-  `telefone_cliente` int(11) NOT NULL,
+  `telefone_cliente` varchar(20) NOT NULL,
   `endereço_cliente` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -39,14 +39,14 @@ CREATE TABLE `cliente` (
 --
 
 INSERT INTO `cliente` (`id_cliente`, `nome_cliente`, `telefone_cliente`, `endereço_cliente`) VALUES
-(1, 'Ana Souza', 2147483647, 'Rua das Flores, 123'),
-(2, 'Carlos Mendes', 2147483647, 'Av. Central, 450'),
-(3, 'Fernanda Lima', 2147483647, 'Rua Azul, 98'),
-(4, 'João Pedro', 2147483647, 'Rua do Lago, 31'),
-(5, 'Mariana Alves', 2147483647, 'Rua Primavera, 55'),
-(6, 'Lucas Martins', 2147483647, 'Alameda Santos, 500'),
-(7, 'Patrícia Gomes', 2147483647, 'Rua da Paz, 10'),
-(8, 'Rafael Costa', 2147483647, 'Rua Verde, 19');
+(1, 'Ana Souza', '(19) 99123-4567', 'Rua das Flores, 123'),
+(2, 'Carlos Mendes', '(19) 98765-4321', 'Av. Central, 450'),
+(3, 'Fernanda Lima', '(19) 97584-2109', 'Rua Azul, 98'),
+(4, 'João Pedro', '(19) 96050-4032', 'Rua do Lago, 31'),
+(5, 'Mariana Alves', '(19) 95175-3908', 'Rua Primavera, 55'),
+(6, 'Lucas Martins', '(19) 94433-2211', 'Alameda Santos, 500'),
+(7, 'Patrícia Gomes', '(19) 93322-1100', 'Rua da Paz, 10'),
+(8, 'Rafael Costa', '(19) 92211-0099', 'Rua Verde, 19');
 
 -- --------------------------------------------------------
 
@@ -58,7 +58,7 @@ CREATE TABLE `encomenda` (
   `id_encomenda` int(11) NOT NULL,
   `id_cliente` int(11) NOT NULL,
   `data_pedido` date NOT NULL,
-  `valor_total` float NOT NULL,
+  `valor_total` decimal(10,2) NOT NULL,
   `status_producao` tinyint(1) NOT NULL,
   `status_pagamento` tinyint(1) NOT NULL,
   `data_entrega_retirada` date NOT NULL
@@ -69,11 +69,12 @@ CREATE TABLE `encomenda` (
 --
 
 INSERT INTO `encomenda` (`id_encomenda`, `id_cliente`, `data_pedido`, `valor_total`, `status_producao`, `status_pagamento`, `data_entrega_retirada`) VALUES
-(1, 1, '2025-11-10', 65, 1, 1, '2025-11-15'),
-(2, 3, '2025-11-12', 30, 0, 1, '2025-11-20'),
-(3, 5, '2025-11-14', 48, 1, 0, '2025-11-18'),
-(4, 7, '2025-11-15', 120, 0, 0, '2025-11-25'),
-(5, 1, '2025-11-21', 13, 0, 1, '2025-11-25');
+(1, 1, '2025-11-10', 65.00, 1, 1, '2025-11-15'),
+(2, 3, '2025-11-12', 30.00, 0, 1, '2025-11-20'),
+(3, 5, '2025-11-14', 48.00, 1, 0, '2025-11-18'),
+(4, 7, '2025-11-15', 120.00, 0, 0, '2025-11-25'),
+(5, 1, '2025-11-26', 13.00, 0, 1, '2025-12-04'),
+(6, 4, '2025-11-25', 75.00, 1, 1, '2025-12-03');
 
 -- --------------------------------------------------------
 
@@ -84,11 +85,11 @@ INSERT INTO `encomenda` (`id_encomenda`, `id_cliente`, `data_pedido`, `valor_tot
 CREATE TABLE `insumo` (
   `id_insumo` int(11) NOT NULL,
   `nome_insumo` varchar(50) NOT NULL,
-  `unidade_medida` enum('kg','g','L','ml','un') NOT NULL,
+  `unidade_medida` enum('g','ml','un') NOT NULL,
   `custo_unitario` decimal(10,2) NOT NULL,
   `quantidade_estoque` int(11) NOT NULL,
   `estoque_minimo` int(11) NOT NULL,
-  `taxa_lucro_insumo` float NOT NULL
+  `taxa_lucro_insumo` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -96,17 +97,17 @@ CREATE TABLE `insumo` (
 --
 
 INSERT INTO `insumo` (`id_insumo`, `nome_insumo`, `unidade_medida`, `custo_unitario`, `quantidade_estoque`, `estoque_minimo`, `taxa_lucro_insumo`) VALUES
-(1, 'Farinha de trigo', 'kg', 6.50, 50, 10, 0),
-(2, 'Açúcar refinado', 'kg', 4.20, 40, 10, 0),
-(3, 'Ovos', 'un', 0.80, 200, 50, 0.2),
-(4, 'Manteiga', 'kg', 28.00, 20, 5, 0.35),
-(5, 'Leite', 'L', 5.00, 30, 5, 0.15),
-(6, 'Chocolate em pó', 'kg', 32.00, 15, 3, 0.4),
-(7, 'Fermento químico', 'g', 0.05, 1000, 200, 0.1),
-(8, 'Cacau 100%', 'kg', 55.00, 10, 3, 0.45),
-(9, 'Essência de baunilha', 'ml', 0.12, 500, 50, 0.3),
+(1, 'Farinha de trigo', 'g', 0.01, 50000, 10000, 0.30),
+(2, 'Açúcar refinado', 'g', 0.05, 40000, 10000, 0.35),
+(3, 'Ovos', 'un', 0.80, 200, 50, 0.20),
+(4, 'Manteiga', 'g', 0.03, 20000, 5000, 0.35),
+(5, 'Leite', 'ml', 0.01, 30000, 5000, 0.15),
+(6, 'Chocolate em pó', 'g', 0.03, 15000, 3000, 0.40),
+(7, 'Fermento químico', 'g', 0.05, 1000, 200, 0.10),
+(8, 'Cacau 100%', 'g', 0.06, 10000, 3000, 0.45),
+(9, 'Essência de baunilha', 'ml', 0.12, 500, 50, 0.30),
 (10, 'Creme de leite', 'ml', 0.04, 800, 100, 0.25),
-(11, 'Mel de abelha', '', 50.00, 10, 5, 0);
+(11, 'Mel de abelha', 'g', 0.05, 4000, 5000, 0.50);
 
 -- --------------------------------------------------------
 
@@ -134,7 +135,9 @@ INSERT INTO `item_encomenda` (`id_item_encomenda`, `id_encomenda`, `id_receita`,
 (6, 4, 2, 20),
 (7, 5, 1, 1),
 (8, 5, 2, 1),
-(9, 5, 4, 1);
+(9, 5, 4, 1),
+(10, 6, 5, 15),
+(11, 6, 3, 10);
 
 -- --------------------------------------------------------
 
@@ -146,7 +149,7 @@ CREATE TABLE `item_receita` (
   `id_item_receita` int(11) NOT NULL,
   `id_insumo` int(11) NOT NULL,
   `id_receita` int(11) NOT NULL,
-  `quantidade_gasta_insumo` float NOT NULL
+  `quantidade_gasta_insumo` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -154,22 +157,25 @@ CREATE TABLE `item_receita` (
 --
 
 INSERT INTO `item_receita` (`id_item_receita`, `id_insumo`, `id_receita`, `quantidade_gasta_insumo`) VALUES
-(1, 1, 1, 0.8),
-(2, 2, 1, 0.5),
-(3, 3, 1, 4),
-(4, 6, 1, 0.3),
-(5, 7, 1, 15),
-(6, 2, 2, 0.4),
-(7, 6, 2, 0.2),
-(8, 10, 2, 200),
-(9, 1, 3, 0.5),
-(10, 2, 3, 0.3),
-(11, 3, 3, 2),
-(12, 4, 3, 0.1),
-(13, 1, 4, 0.4),
-(14, 2, 4, 0.3),
-(15, 3, 4, 3),
-(16, 9, 4, 10);
+(1, 1, 1, 0.80),
+(2, 2, 1, 0.50),
+(3, 3, 1, 4.00),
+(4, 6, 1, 0.30),
+(5, 7, 1, 15.00),
+(6, 2, 2, 0.40),
+(7, 6, 2, 0.20),
+(8, 10, 2, 200.00),
+(9, 1, 3, 0.50),
+(10, 2, 3, 0.30),
+(11, 3, 3, 2.00),
+(12, 4, 3, 0.10),
+(13, 1, 4, 0.40),
+(14, 2, 4, 0.30),
+(15, 3, 4, 3.00),
+(16, 9, 4, 10.00),
+(17, 5, 5, 0.50),
+(18, 10, 5, 300.00),
+(19, 2, 5, 0.40);
 
 -- --------------------------------------------------------
 
@@ -195,7 +201,9 @@ INSERT INTO `lote` (`id_lote`, `id_insumo`, `fornecedor`, `quantidade_compra`, `
 (1, 1, 'Fornecedor TrigoBom', 30, 6.00, '2026-02-10', '2025-01-20'),
 (2, 3, 'Granjas Unidas', 100, 0.75, '2025-12-15', '2025-01-22'),
 (3, 6, 'ChocoMax', 10, 30.00, '2026-05-20', '2025-02-02'),
-(4, 10, 'Laticínios Ultra', 300, 0.03, '2025-11-15', '2025-01-10');
+(4, 10, 'Laticínios Ultra', 300, 0.03, '2025-11-15', '2025-01-10'),
+(5, 4, 'Manteiga Nobre', 15, 27.50, '2026-03-01', '2025-02-15'),
+(6, 2, 'Doce Mais', 50, 4.00, '2026-06-30', '2025-02-20');
 
 -- --------------------------------------------------------
 
@@ -207,9 +215,9 @@ CREATE TABLE `receita` (
   `id_receita` int(11) NOT NULL,
   `nome_receita` varchar(50) NOT NULL,
   `rendimento_receita` int(11) NOT NULL,
-  `custo_total_mp` float NOT NULL,
-  `custo_unitario` float NOT NULL,
-  `preco_venda_sugerido` float NOT NULL,
+  `custo_total_mp` decimal(10,2) NOT NULL,
+  `custo_unitario` decimal(10,2) NOT NULL,
+  `preco_venda_sugerido` decimal(10,2) NOT NULL,
   `taxa_lucro_receita` decimal(10,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -218,10 +226,11 @@ CREATE TABLE `receita` (
 --
 
 INSERT INTO `receita` (`id_receita`, `nome_receita`, `rendimento_receita`, `custo_total_mp`, `custo_unitario`, `preco_venda_sugerido`, `taxa_lucro_receita`) VALUES
-(1, 'Bolo de Chocolate', 10, 28.5, 2.85, 6.5, 1.28),
-(2, 'Brigadeiro Gourmet', 25, 22, 0.88, 2.5, 1.84),
-(3, 'Cookies Tradicionais', 20, 18, 0.9, 3, 2.33),
-(4, 'Cupcake Baunilha', 12, 15, 1.25, 4, 2.20);
+(1, 'Bolo de Chocolate', 10, 28.50, 2.85, 6.50, 1.28),
+(2, 'Brigadeiro Gourmet', 25, 22.00, 0.88, 2.50, 1.84),
+(3, 'Cookies Tradicionais', 20, 18.00, 0.90, 3.00, 2.33),
+(4, 'Cupcake Baunilha', 12, 15.00, 1.25, 4.00, 2.20),
+(5, 'Torta de Limão', 8, 30.00, 3.75, 7.50, 1.00);
 
 --
 -- Índices para tabelas despejadas
@@ -289,7 +298,7 @@ ALTER TABLE `cliente`
 -- AUTO_INCREMENT de tabela `encomenda`
 --
 ALTER TABLE `encomenda`
-  MODIFY `id_encomenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_encomenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de tabela `insumo`
@@ -301,25 +310,25 @@ ALTER TABLE `insumo`
 -- AUTO_INCREMENT de tabela `item_encomenda`
 --
 ALTER TABLE `item_encomenda`
-  MODIFY `id_item_encomenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id_item_encomenda` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT de tabela `item_receita`
 --
 ALTER TABLE `item_receita`
-  MODIFY `id_item_receita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id_item_receita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT de tabela `lote`
 --
 ALTER TABLE `lote`
-  MODIFY `id_lote` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_lote` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT de tabela `receita`
 --
 ALTER TABLE `receita`
-  MODIFY `id_receita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_receita` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Restrições para tabelas despejadas
