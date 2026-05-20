@@ -138,6 +138,26 @@
             <button type="submit" class="btn-enviar">Adicionar Ingrediente</button>
             <button type="button" id="btn-cancelar-ingrediente" class="btn" style="background-color: #6c757d;">Cancelar</button>
         </form>
+
+        <!-- Formulário para adicionar custos extras -->
+        <div id="form-custo-extra" style="display: none; margin-top: 15px;">
+            <h4>➕ Adicionar Custo Extra (embalagem, etiqueta, fita)</h4>
+            <form id="form-custo-extra-form" class="formulario">
+                <input type="hidden" id="receita_id_custo" name="receita_id">
+                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 15px;">
+                    <div>
+                        <label for="descricao_custo">Descrição:</label>
+                        <input type="text" id="descricao_custo" name="descricao" placeholder="Ex: Embalagem caixa" required>
+                    </div>
+                    <div>
+                        <label for="valor_custo">Valor (R$):</label>
+                        <input type="number" id="valor_custo" name="valor" step="0.01" value="0.00" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-enviar">Adicionar Custo Extra</button>
+                <button type="button" id="btn-cancelar-custo" class="btn" style="background-color: #6c757d;">Cancelar</button>
+            </form>
+        </div>
     </div>
 
     <!-- Formulário para registrar produção -->
@@ -324,7 +344,13 @@ function exibirReceitas() {
 // Adicionar ingrediente à receita
 async function adicionarIngrediente(receitaId) {
     document.getElementById('receita_id_ingrediente').value = receitaId;
+    // Também popular campo do formulário de custos extras
+    const receitaCusto = document.getElementById('receita_id_custo');
+    if(receitaCusto) receitaCusto.value = receitaId;
     document.getElementById('form-ingredientes').style.display = 'block';
+    // Mostrar formulário de custos extras junto quando for relevante
+    const formCusto = document.getElementById('form-custo-extra');
+    if(formCusto) formCusto.style.display = 'block';
 }
 
 // Ver ingredientes da receita
@@ -446,6 +472,53 @@ document.getElementById('form-ingrediente').addEventListener('submit', async fun
         console.error('Erro:', error);
         mostrarMensagem('Erro ao adicionar ingrediente', 'error');
     }
+});
+
+// Adicionar custo extra
+document.getElementById('form-custo-extra-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const receitaId = document.getElementById('receita_id_custo').value;
+    const descricao = document.getElementById('descricao_custo').value;
+    const valor = parseFloat(document.getElementById('valor_custo').value) || 0;
+
+    if(!receitaId || valor <= 0 || !descricao) {
+        mostrarMensagem('Preencha descrição, receita e valor válidos', 'error');
+        return;
+    }
+
+    const formData = {
+        receita_id: receitaId,
+        descricao: descricao,
+        valor: valor
+    };
+
+    try {
+        const response = await fetch('../api/custos_extras.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
+
+        const data = await response.json();
+        if(data.success) {
+            mostrarMensagem('Custo extra adicionado com sucesso!', 'success');
+            document.getElementById('form-custo-extra-form').reset();
+            document.getElementById('form-custo-extra').style.display = 'none';
+            // Recarregar receitas para atualizar valores
+            carregarReceitas();
+        } else {
+            mostrarMensagem(data.message || 'Erro ao adicionar custo extra', 'error');
+        }
+    } catch(error) {
+        console.error('Erro:', error);
+        mostrarMensagem('Erro ao adicionar custo extra', 'error');
+    }
+});
+
+document.getElementById('btn-cancelar-custo').addEventListener('click', function() {
+    document.getElementById('form-custo-extra').style.display = 'none';
+    document.getElementById('form-custo-extra-form').reset();
 });
 
 // Registrar produção
