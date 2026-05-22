@@ -115,8 +115,8 @@
                     <input type="number" id="quantidade_ingrediente" name="quantidade" step="0.001" required>
                 </div>
                 <div>
-                    <label for="unidade_medida_ingrediente">Unidade:</label>
-                    <select id="unidade_medida_ingrediente" name="unidade_medida" required>
+                    <label for="unidade_uso_ingrediente">Unidade:</label>
+                    <select id="unidade_uso_ingrediente" name="unidade_uso" required>
                         <option value="kg">kg</option>
                         <option value="g">g</option>
                         <option value="L">L</option>
@@ -134,6 +134,11 @@
 
             <label for="observacoes_ingrediente">Observações:</label>
             <input type="text" id="observacoes_ingrediente" name="observacoes">
+
+            <div id="preview-custo-ingrediente" style="margin-top:10px; display:none; background:#fff8f0; padding:10px; border-radius:6px;">
+                <strong>Pré-visualização do custo:</strong>
+                <p>Custo estimado deste ingrediente: R$ <span id="preview-custo-valor">0.00</span></p>
+            </div>
 
             <button type="submit" class="btn-enviar">Adicionar Ingrediente</button>
             <button type="button" id="btn-cancelar-ingrediente" class="btn" style="background-color: #6c757d;">Cancelar</button>
@@ -183,6 +188,17 @@
             <button type="submit" class="btn-enviar">Registrar Produção</button>
             <button type="button" id="btn-cancelar-producao" class="btn" style="background-color: #6c757d;">Cancelar</button>
         </form>
+    </div>
+
+    <!-- Modal de ingredientes (lista com remover) -->
+    <div id="modal-ingredientes" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center;">
+        <div style="background:#fff; padding:20px; border-radius:8px; width:90%; max-width:800px; max-height:80%; overflow:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3>Ingredientes</h3>
+                <button id="fechar-modal-ingredientes" class="btn">Fechar</button>
+            </div>
+            <div id="lista-ingredientes-modal"></div>
+        </div>
     </div>
 
     <!-- Lista de receitas -->
@@ -292,7 +308,7 @@ function preencherSelectInsumos() {
             insumos.forEach(insumo => {
                 const option = document.createElement('option');
                 option.value = insumo.id;
-                option.textContent = `${insumo.nome} (${insumo.unidade_medida})`;
+                option.textContent = `${insumo.nome} (${insumo.unidade_compra})`;
                 select.appendChild(option);
             });
         }
@@ -358,18 +374,59 @@ async function verIngredientes(receitaId) {
     try {
         const response = await fetch(`../api/receitas.php?ingredientes=1&receita_id=${receitaId}`);
         const data = await response.json();
-        
+
         if(data.success) {
-            let ingredientesHtml = '<h4>Ingredientes:</h4><ul>';
-            data.data.forEach(ingrediente => {
-                ingredientesHtml += `<li>${ingrediente.quantidade} ${ingrediente.unidade_medida} de ${ingrediente.insumo_nome}</li>`;
-            });
-            ingredientesHtml += '</ul>';
-            
-            mostrarMensagem(ingredientesHtml, 'info');
+            const lista = document.getElementById('lista-ingredientes-modal');
+            lista.innerHTML = '';
+            if(data.data.length === 0) {
+                lista.innerHTML = '<p>Nenhum ingrediente cadastrado.</p>';
+            } else {
+                const ul = document.createElement('ul');
+                data.data.forEach(ingrediente => {
+                    const li = document.createElement('li');
+                    li.style.marginBottom = '8px';
+                    li.innerHTML = `${ingrediente.quantidade} ${ingrediente.unidade_uso} de <strong>${ingrediente.insumo_nome}</strong> ` +
+                                   `<button class="btn" style="margin-left:10px;" onclick="removerIngrediente(${receitaId}, ${ingrediente.id})">Remover</button>`;
+                    ul.appendChild(li);
+                });
+                lista.appendChild(ul);
+            }
+
+            document.getElementById('modal-ingredientes').style.display = 'flex';
         }
     } catch(error) {
         console.error('Erro ao carregar ingredientes:', error);
+        mostrarMensagem('Erro ao carregar ingredientes', 'error');
+    }
+}
+
+// Fechar modal ingredientes
+document.getElementById('fechar-modal-ingredientes').addEventListener('click', function() {
+    document.getElementById('modal-ingredientes').style.display = 'none';
+});
+
+// Remover ingrediente via API
+async function removerIngrediente(receitaId, ingredienteId) {
+    if(!confirm('Remover este ingrediente?')) return;
+    try {
+        const response = await fetch('../api/receitas.php', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ remover_ingrediente: true, receita_id: receitaId, ingrediente_id: ingredienteId })
+        });
+        const data = await response.json();
+        if(data.success) {
+            mostrarMensagem('Ingrediente removido', 'success');
+            verIngredientes(receitaId);
+            // Recalcular preços da receita
+            setTimeout(() => calcularPrecosReceita(receitaId, parseFloat(document.getElementById('margem_lucro').value || 30)), 300);
+            carregarReceitas();
+        } else {
+            mostrarMensagem(data.message || 'Erro ao remover ingrediente', 'error');
+        }
+    } catch(err) {
+        console.error(err);
+        mostrarMensagem('Erro ao remover ingrediente', 'error');
     }
 }
 
@@ -414,11 +471,25 @@ document.getElementById('form-receita').addEventListener('submit', async functio
         
         if(data.success) {
             mostrarMensagem(isEdicao ? 'Receita atualizada com sucesso!' : 'Receita criada com sucesso!', 'success');
-            document.getElementById('form-nova-receita').style.display = 'none';
-            document.getElementById('form-receita').reset();
-            if(receitaIdEdicao) receitaIdEdicao.remove();
-            document.querySelector('#form-nova-receita h3').textContent = 'Cadastrar Nova Receita';
-            document.querySelector('#form-receita button[type="submit"]').textContent = 'Salvar Receita';
+            // Se for criação nova, abrir o formulário de ingredientes para preencher os ingredientes
+            if(!isEdicao) {
+                const novoId = data.data && data.data.id ? data.data.id : null;
+                document.getElementById('form-nova-receita').style.display = 'none';
+                document.getElementById('form-receita').reset();
+                if(receitaIdEdicao) receitaIdEdicao.remove();
+                document.querySelector('#form-nova-receita h3').textContent = 'Cadastrar Nova Receita';
+                document.querySelector('#form-receita button[type="submit"]').textContent = 'Salvar Receita';
+                if(novoId) {
+                    // abrir imediatamente para adicionar ingredientes
+                    adicionarIngrediente(novoId);
+                }
+            } else {
+                document.getElementById('form-nova-receita').style.display = 'none';
+                document.getElementById('form-receita').reset();
+                if(receitaIdEdicao) receitaIdEdicao.remove();
+                document.querySelector('#form-nova-receita h3').textContent = 'Cadastrar Nova Receita';
+                document.querySelector('#form-receita button[type="submit"]').textContent = 'Salvar Receita';
+            }
             carregarReceitas();
         } else {
             mostrarMensagem(data.message, 'error');
@@ -438,7 +509,7 @@ document.getElementById('form-ingrediente').addEventListener('submit', async fun
         receita_id: document.getElementById('receita_id_ingrediente').value,
         insumo_id: document.getElementById('insumo_id').value,
         quantidade: document.getElementById('quantidade_ingrediente').value,
-        unidade_uso: document.getElementById('unidade_medida_ingrediente').value,
+        unidade_uso: document.getElementById('unidade_uso_ingrediente').value,
         observacoes: document.getElementById('observacoes_ingrediente').value,
         ordem: document.getElementById('ordem').value
     };
@@ -473,6 +544,51 @@ document.getElementById('form-ingrediente').addEventListener('submit', async fun
         mostrarMensagem('Erro ao adicionar ingrediente', 'error');
     }
 });
+
+// Calcular custo estimado do ingrediente no formulário
+function calcularCustoIngrediente() {
+    const insumoId = parseInt(document.getElementById('insumo_id').value || 0);
+    const quantidade = parseFloat(document.getElementById('quantidade_ingrediente').value || 0);
+    const unidadeUso = document.getElementById('unidade_uso_ingrediente').value;
+
+    if(!insumoId || quantidade <= 0) {
+        document.getElementById('preview-custo-ingrediente').style.display = 'none';
+        return;
+    }
+
+    const insumo = insumos.find(i => parseInt(i.id) === insumoId);
+    if(!insumo) return;
+
+    // Conversão simples baseada em unidade_compra e fator_conversao
+    let quantidadeConvertida = quantidade;
+    const origem = unidadeUso;
+    const destino = insumo.unidade_compra || insumo.unidade_compra;
+    const fator = parseFloat(insumo.fator_conversao) || 1.0;
+
+    if(origem === destino) {
+        quantidadeConvertida = quantidade;
+    } else if((origem === 'kg' && destino === 'g') || (origem === 'L' && destino === 'ml')) {
+        quantidadeConvertida = quantidade * (fator || 1000);
+    } else if((origem === 'g' && destino === 'kg') || (origem === 'ml' && destino === 'L')) {
+        quantidadeConvertida = quantidade / (fator || 1000);
+    } else {
+        const conversoes = { 'kg': {'g':1000}, 'g':{'kg':0.001}, 'L':{'ml':1000}, 'ml':{'L':0.001} };
+        if(conversoes[origem] && conversoes[origem][destino]) {
+            quantidadeConvertida = quantidade * conversoes[origem][destino];
+        }
+    }
+
+    const custoUnitario = parseFloat(insumo.custo_unitario_atual) || 0;
+    const custoEstimado = quantidadeConvertida * custoUnitario;
+
+    document.getElementById('preview-custo-valor').textContent = custoEstimado.toFixed(2);
+    document.getElementById('preview-custo-ingrediente').style.display = 'block';
+}
+
+// Listeners para cálculo ao vivo
+document.getElementById('insumo_id').addEventListener('change', calcularCustoIngrediente);
+document.getElementById('quantidade_ingrediente').addEventListener('input', calcularCustoIngrediente);
+document.getElementById('unidade_uso_ingrediente').addEventListener('change', calcularCustoIngrediente);
 
 // Adicionar custo extra
 document.getElementById('form-custo-extra-form').addEventListener('submit', async function(e) {
@@ -630,7 +746,7 @@ function exibirLotes() {
             <div style="display: flex; justify-content: space-between; align-items: start;">
                 <div>
                     <h5>${lote.insumo_nome} - Lote: ${lote.lote}</h5>
-                    <p><strong>Quantidade:</strong> ${lote.quantidade_atual} ${lote.unidade_medida}</p>
+                    <p><strong>Quantidade:</strong> ${lote.quantidade_atual} ${lote.unidade_compra}</p>
                     <p><strong>Validade:</strong> ${new Date(lote.data_validade).toLocaleDateString()}</p>
                     <p><strong>Status:</strong> ${lote.status}</p>
                 </div>
@@ -705,7 +821,7 @@ function exibirAlertasValidade() {
                     <p><strong>Insumo:</strong> ${alerta.insumo_nome}</p>
                     <p><strong>Lote:</strong> ${alerta.lote}</p>
                     <p><strong>Validade:</strong> ${new Date(alerta.data_validade).toLocaleDateString()}</p>
-                    <p><strong>Quantidade:</strong> ${alerta.quantidade_atual} ${alerta.unidade_medida}</p>
+                    <p><strong>Quantidade:</strong> ${alerta.quantidade_atual} ${alerta.unidade_compra}</p>
                 </div>
                 <div>
                     <button onclick="marcarAlertaVisualizado(${alerta.id})" class="btn">✅ Visualizado</button>

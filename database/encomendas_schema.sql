@@ -1,3 +1,5 @@
+USE confeitaria_db;
+
 -- Tabela de Encomendas
 CREATE TABLE IF NOT EXISTS encomendas (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -16,9 +18,19 @@ CREATE TABLE IF NOT EXISTS encomendas (
     FOREIGN KEY (receita_id) REFERENCES receitas(id) ON DELETE RESTRICT
 );
 
--- Índices para encomendas
-CREATE INDEX IF NOT EXISTS idx_encomendas_status ON encomendas(status);
-CREATE INDEX IF NOT EXISTS idx_encomendas_data_entrega ON encomendas(data_entrega);
-CREATE INDEX IF NOT EXISTS idx_encomendas_receita ON encomendas(receita_id);
-CREATE INDEX IF NOT EXISTS idx_encomendas_data_pedido ON encomendas(data_pedido);
+DELIMITER $$
+DROP PROCEDURE IF EXISTS create_encomendas_indexes$$
+CREATE PROCEDURE create_encomendas_indexes()
+BEGIN
+    DECLARE CONTINUE HANDLER FOR 1061 BEGIN END;
+
+    CREATE INDEX idx_encomendas_status ON encomendas(status);
+    CREATE INDEX idx_encomendas_data_entrega ON encomendas(data_entrega);
+    CREATE INDEX idx_encomendas_receita ON encomendas(receita_id);
+    CREATE INDEX idx_encomendas_data_pedido ON encomendas(data_pedido);
+END$$
+DELIMITER ;
+
+CALL create_encomendas_indexes();
+DROP PROCEDURE IF EXISTS create_encomendas_indexes;
 

@@ -11,7 +11,6 @@ class Encomenda {
     private $table_name = "encomendas";
     private $receitas_table = "receitas";
 
-<<<<<<< Updated upstream
     public $id;
     public $cliente_nome;
     public $cliente_telefone;
@@ -23,16 +22,6 @@ class Encomenda {
     public $data_entrega;
     public $status;
     public $observacoes;
-=======
-    public $id_encomenda;
-    public $id_cliente;
-    public $data_pedido;
-    public $valor_total;
-    public $status_producao;
-    public $status_pagamento;
-    public $data_entrega_retirada;
-    public $baixa_realizada = 0;
->>>>>>> Stashed changes
 
     public function __construct($db) {
         $this->conn = $db;
@@ -147,7 +136,6 @@ class Encomenda {
         
         if($stmt->rowCount() > 0) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
-<<<<<<< Updated upstream
             $this->id = $row['id'];
             $this->cliente_nome = $row['cliente_nome'];
             $this->cliente_telefone = $row['cliente_telefone'];
@@ -159,16 +147,6 @@ class Encomenda {
             $this->data_entrega = $row['data_entrega'];
             $this->status = $row['status'];
             $this->observacoes = $row['observacoes'];
-=======
-            $this->id_encomenda = $row['id_encomenda'];
-            $this->id_cliente = $row['id_cliente'];
-            $this->data_pedido = $row['data_pedido'];
-            $this->valor_total = $row['valor_total'];
-            $this->status_producao = $row['status_producao'];
-            $this->status_pagamento = $row['status_pagamento'];
-            $this->data_entrega_retirada = $row['data_entrega_retirada'];
-            $this->baixa_realizada = isset($row['baixa_realizada']) ? (int)$row['baixa_realizada'] : 0;
->>>>>>> Stashed changes
             return true;
         }
         return false;
@@ -234,153 +212,7 @@ class Encomenda {
             $this->status = $novo_status;
             return true;
         }
-<<<<<<< Updated upstream
         return false;
-=======
-    }
-
-    /**
-     * Aplicar baixa de insumos no estoque com base na ficha técnica (itens da receita)
-     * Varre os itens da encomenda, consulta os ingredientes de cada receita
-     * e subtrai a quantidade correspondente do insumo em estoque.
-     */
-    public function aplicarBaixaEstoque() {
-        if(empty($this->id_encomenda)) {
-            return false;
-        }
-
-        // Verificar se já foi aplicada
-        try {
-            $check = $this->conn->prepare("SELECT baixa_realizada FROM " . $this->table_name . " WHERE id_encomenda = :id");
-            $check->bindParam(':id', $this->id_encomenda, PDO::PARAM_INT);
-            $check->execute();
-            $row = $check->fetch(PDO::FETCH_ASSOC);
-            if($row && (int)($row['baixa_realizada'] ?? 0) === 1) {
-                // Já aplicada
-                return false;
-            }
-        } catch(Exception $e) {
-            // Não impedir a execução; prosseguir
-        }
-
-        // Iniciar transação para garantir integridade
-        try {
-            $this->conn->beginTransaction();
-
-            // Buscar itens da encomenda
-            $itens = $this->listarItens();
-
-            while($item = $itens->fetch(PDO::FETCH_ASSOC)) {
-            $id_receita = $item['id_receita'];
-            $quantidade_vendida = $item['quantidate_vendida'] ?? $item['quantidade_vendida'] ?? 0;
-
-            // Buscar ingredientes da receita
-            $query_ing = "SELECT id_insumo, quantidade_gasta_insumo FROM item_receita WHERE id_receita = :id_receita";
-            $stmt_ing = $this->conn->prepare($query_ing);
-            $stmt_ing->bindParam(':id_receita', $id_receita);
-            $stmt_ing->execute();
-
-            while($ing = $stmt_ing->fetch(PDO::FETCH_ASSOC)) {
-                $insumo_id = $ing['id_insumo'];
-                $qtde_por_unidade = $ing['quantidade_gasta_insumo'];
-                $total_consumo = $qtde_por_unidade * $quantidade_vendida;
-
-                // Subtrair do estoque do insumo
-                $query_up = "UPDATE insumo SET quantidade_estoque = quantidade_estoque - :consumo WHERE id_insumo = :id_insumo";
-                $stmt_up = $this->conn->prepare($query_up);
-                $stmt_up->bindParam(':consumo', $total_consumo);
-                $stmt_up->bindParam(':id_insumo', $insumo_id, PDO::PARAM_INT);
-                try {
-                    $stmt_up->execute();
-                } catch(PDOException $e) {
-                    error_log("Erro ao aplicar baixa de estoque para insumo {$insumo_id}: " . $e->getMessage());
-                    // continuar para os demais insumos
-                }
-            }
-        }
-
-            // Marcar baixa realizada
-            $upd = $this->conn->prepare("UPDATE " . $this->table_name . " SET baixa_realizada = 1 WHERE id_encomenda = :id_encomenda");
-            $upd->bindParam(':id_encomenda', $this->id_encomenda, PDO::PARAM_INT);
-            $upd->execute();
-
-            $this->conn->commit();
-            return true;
-        } catch(Exception $e) {
-            try { $this->conn->rollBack(); } catch(Exception $_) {}
-            error_log('Erro ao aplicar baixa automática: ' . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Atualizar status de pagamento
-     */
-    public function atualizarStatusPagamento($status) {
-        $query = "UPDATE " . $this->table_name . " 
-                  SET status_pagamento = :status_pagamento
-                  WHERE id_encomenda = :id_encomenda";
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':status_pagamento', $status, PDO::PARAM_STR);
-        $stmt->bindParam(':id_encomenda', $this->id_encomenda, PDO::PARAM_INT);
-
-        try {
-            return $stmt->execute();
-        } catch(PDOException $e) {
-            error_log("Erro ao atualizar status de pagamento: " . $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
-     * Calcular valor total da encomenda
-     */
-    public function calcularValorTotal() {
-        $query = "SELECT SUM(ie.quantidate_vendida * r.preco_venda_sugerido) as valor_total
-                  FROM " . $this->item_table . " ie
-                  INNER JOIN " . $this->receita_table . " r ON ie.id_receita = r.id_receita
-                  WHERE ie.id_encomenda = :id_encomenda";
-
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id_encomenda', $this->id_encomenda);
-        $stmt->execute();
-        
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $result['valor_total'] ?? 0;
-    }
-
-    /**
-     * Atualizar valor total da encomenda
-     */
-    public function atualizarValorTotal() {
-        $valor_total = $this->calcularValorTotal();
-        
-        $query = "UPDATE " . $this->table_name . " 
-                  SET valor_total = :valor_total
-                  WHERE id_encomenda = :id_encomenda";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':valor_total', $valor_total);
-        $stmt->bindParam(':id_encomenda', $this->id_encomenda);
-        
-        return $stmt->execute();
-    }
-
-    /**
-     * Listar encomendas por cliente
-     */
-    public function listarPorCliente($id_cliente) {
-        $query = "SELECT e.*, c.nome_cliente 
-                  FROM " . $this->table_name . " e
-                  INNER JOIN " . $this->cliente_table . " c ON e.id_cliente = c.id_cliente
-                  WHERE e.id_cliente = :id_cliente
-                  ORDER BY e.data_pedido DESC";
-        
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id_cliente', $id_cliente);
-        $stmt->execute();
-        return $stmt;
->>>>>>> Stashed changes
     }
 
     /**

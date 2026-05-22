@@ -224,7 +224,6 @@ class Receita {
         $stmt->bindParam(':receita_id', $this->id);
         $stmt->execute();
         
-<<<<<<< Updated upstream
         $custo_total = 0;
         
         while($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -239,23 +238,6 @@ class Receita {
             $custo_total += $quantidade_convertida * $row['custo_unitario_atual'];
         }
         
-=======
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        $custo_total = $result['custo_total'] ?? 0;
-
-        // Incluir custos extras (embalagens, etiquetas, fitas) se tabela existir
-        try {
-            $query_extras = "SELECT SUM(valor) as total_extras FROM custo_extra WHERE id_receita = :id_receita";
-            $stmt_extras = $this->conn->prepare($query_extras);
-            $stmt_extras->bindParam(':id_receita', $this->id_receita);
-            $stmt_extras->execute();
-            $row_extras = $stmt_extras->fetch(PDO::FETCH_ASSOC);
-            $custo_total += $row_extras['total_extras'] ?? 0;
-        } catch(Exception $e) {
-            // Se a tabela não existir ou ocorrer erro, ignorar extras
-        }
-
->>>>>>> Stashed changes
         return $custo_total;
     }
 
